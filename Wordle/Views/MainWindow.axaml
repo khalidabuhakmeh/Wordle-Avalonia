@@ -1,0 +1,134 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Wordle.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+        xmlns:e="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+        mc:Ignorable="d" d:DesignWidth="550" d:DesignHeight="550"
+        Width="550" Height="550"
+        CanResize="false"
+        x:Class="Wordle.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="Wordle">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+    <i:Interaction.Behaviors>
+        <e:EventTriggerBehavior EventName="KeyUp">
+            <e:InvokeCommandAction Command="{Binding GuessLetterCommand}"
+                                   PassEventArgsToCommand="True" />
+        </e:EventTriggerBehavior>
+    </i:Interaction.Behaviors>
+
+    <Window.Styles>
+        <Style Selector="Border.tile">
+            <Setter Property="BorderBrush" Value="DimGray" />
+            <Setter Property="Background" Value="#DDDDDD" />
+        </Style>
+        <Style Selector="ItemsRepeater.guessed > Border">
+            <Setter Property="BorderBrush" Value="DarkRed" />
+            <Setter Property="Background" Value="LightPink" />
+        </Style>
+        <Style Selector="ItemsRepeater.guessed > Border.partial">
+            <Setter Property="Background" Value="LightGoldenrodYellow" />
+        </Style>
+        <Style Selector="ItemsRepeater.guessed > Border.exact">
+            <Setter Property="Background" Value="LightGreen" />
+        </Style>
+        <Style Selector="Border.win">
+            <Setter Property="BorderBrush" Value="LimeGreen" />
+            <Setter Property="Background" Value="PaleGreen" />
+            <Setter Property="CornerRadius" Value="5" />
+        </Style>
+        <Style Selector="Border.lose">
+            <Setter Property="BorderBrush" Value="DarkRed" />
+            <Setter Property="Background" Value="PaleVioletRed" />
+            <Setter Property="CornerRadius" Value="5" />
+        </Style>
+    </Window.Styles>
+
+    <Grid ColumnDefinitions="Auto"
+          RowDefinitions="Auto, Auto, Auto, Auto"
+          HorizontalAlignment="Center"
+          VerticalAlignment="Center">
+        <TextBlock Text="Wordle"
+                   TextAlignment="Center"
+                   FontSize="50"
+                   FontWeight="Bold"
+                   Margin="0,0,0,20"
+                   TextDecorations="Underline" />
+        <Border Grid.Row="1"
+                Margin="10"
+                Padding="20"
+                HorizontalAlignment="Center"
+                Classes.win="{Binding HasWon}"
+                Classes.lose="{Binding HasLost}">
+            <TextBlock FontSize="15"
+                       IsVisible="{Binding IsGameOver}"
+                       TextAlignment="Center"
+                       Text="{Binding GameOverText}" />
+        </Border>
+        <ItemsRepeater
+            Grid.Row="2"
+            Items="{Binding Guesses}"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center">
+            <ItemsRepeater.Layout>
+                <StackLayout
+                    Spacing="10"
+                    Orientation="Vertical" />
+            </ItemsRepeater.Layout>
+            <ItemsRepeater.ItemTemplate>
+                <DataTemplate x:DataType="vm:Guess">
+                    <ItemsRepeater Items="{Binding Tiles}" Classes.guessed="{Binding HasGuessed}">
+                        <ItemsRepeater.Layout>
+                            <StackLayout
+                                Spacing="10"
+                                Orientation="Horizontal" />
+                        </ItemsRepeater.Layout>
+                        <ItemsRepeater.ItemTemplate>
+                            <DataTemplate x:DataType="vm:Tile">
+                                <Border BorderThickness="1"
+                                        Width="50"
+                                        Height="50"
+                                        CornerRadius="4"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Classes="tile"
+                                        Classes.exact="{Binding IsExact, Mode=TwoWay}"
+                                        Classes.partial="{Binding IsPartial, Mode=TwoWay}">
+                                    <TextBlock FontSize="20"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               TextAlignment="Center"
+                                               FontWeight="Bold"
+                                               Text="{Binding Actual, Mode=TwoWay}" />
+                                </Border>
+                            </DataTemplate>
+                        </ItemsRepeater.ItemTemplate>
+                    </ItemsRepeater>
+                </DataTemplate>
+            </ItemsRepeater.ItemTemplate>
+        </ItemsRepeater>
+        <StackPanel Grid.Row="3"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal"
+                    Margin="20" Spacing="20">
+            <Button Content="Reset"
+                    Command="{Binding ResetCommand}"
+                    IsDefault="{Binding IsGameOver}"
+                    IsEnabled="{Binding IsGameOver}" />
+            <TextBlock Text="{Binding CurrentWord}"
+                       IsVisible="{Binding IsGameOver}"
+                       Margin="10" />
+        </StackPanel>
+    </Grid>
+
+</Window>
