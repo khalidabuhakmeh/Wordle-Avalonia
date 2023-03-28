@@ -7,7 +7,9 @@ namespace Wordle.ViewModels;
 public partial class Tile : ObservableObject
 {
     [ObservableProperty, 
-     NotifyPropertyChangedFor(nameof(IsExact))]
+     NotifyPropertyChangedFor(nameof(IsExact)),
+     NotifyPropertyChangedFor(nameof(HasValue))
+    ]
     private char _actual = '_';
 
     [ObservableProperty] private char? _expected;

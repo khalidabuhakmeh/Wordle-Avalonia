@@ -101,4 +101,11 @@ public partial class MainWindowViewModel : ViewModelBase
             GameState = GameState.Lost;    
         }
     }
+
+    [RelayCommand]
+    private void QuietTheBeep(KeyEventArgs args)
+    {
+        args.Handled = true;
+        // a command to quiet the beep
+    }
 }
